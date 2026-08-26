@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { tashkentDateKey } from '@/lib/date';
+import { bookingInputSchema } from '@/lib/validation/booking';
 
 type FormState = {
   name: string;
@@ -44,17 +45,28 @@ export function BookingForm() {
     event.preventDefault();
     if (loading) return;
 
-    setLoading(true);
     setError('');
+    const clientParsed = bookingInputSchema.safeParse(form);
+    if (!clientParsed.success) {
+      setError(clientParsed.error.issues[0]?.message || 'Проверьте данные формы');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(clientParsed.data)
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Не удалось отправить заявку');
+      if (!response.ok) {
+        const serverError = data?.errors
+          ? Object.values(data.errors as Record<string, string[]>).flat().find(Boolean)
+          : undefined;
+        throw new Error(serverError || data.message || 'Не удалось отправить заявку');
+      }
       setSuccessId(data.publicId || '');
       setForm(initialState);
     } catch (submitError) {
@@ -78,15 +90,15 @@ export function BookingForm() {
     <form className="booking-form" onSubmit={submit} noValidate>
       <div className="field">
         <label htmlFor="booking-name">Имя</label>
-        <input id="booking-name" name="name" autoComplete="name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <input id="booking-name" name="name" autoComplete="name" required maxLength={80} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
       </div>
       <div className="field">
         <label htmlFor="booking-phone">Телефон</label>
-        <input id="booking-phone" name="phone" inputMode="tel" autoComplete="tel" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+998 90 123 45 67" />
+        <input id="booking-phone" name="phone" inputMode="tel" autoComplete="tel" required maxLength={24} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+998 90 123 45 67" />
       </div>
       <div className="field field--full">
         <label htmlFor="booking-telegram">Telegram <span aria-hidden="true">(необязательно)</span></label>
-        <input id="booking-telegram" name="telegram" autoComplete="off" value={form.telegram} onChange={(e) => setForm({ ...form, telegram: e.target.value })} placeholder="@username" />
+        <input id="booking-telegram" name="telegram" autoComplete="off" maxLength={120} value={form.telegram} onChange={(e) => setForm({ ...form, telegram: e.target.value })} placeholder="@username" />
       </div>
       <div className="field field--full">
         <label htmlFor="booking-date">Дата посещения</label>
@@ -114,7 +126,7 @@ export function BookingForm() {
 
       <div className="field field--full">
         <label htmlFor="booking-comment">Комментарий</label>
-        <textarea id="booking-comment" name="comment" value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} placeholder="Если есть пожелания — напишите здесь" />
+        <textarea id="booking-comment" name="comment" maxLength={1000} value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} placeholder="Если есть пожелания — напишите здесь" />
       </div>
 
       <div className="honeypot" aria-hidden="true">
