@@ -21,7 +21,6 @@ export default function HomePage() {
       streetAddress: 'массив Карасу-4, ул. Гулсанам',
       addressCountry: 'UZ'
     },
-    openingHours: 'Mo-Su 06:00-23:00',
     sameAs: [site.instagramUrl],
     image: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/images/monaco/hero.webp`
   };
