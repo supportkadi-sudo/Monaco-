@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  NEW
+  CONTACTED
+  CONFIRMED
+  CANCELLED
+}
+
+model Booking {
+  id                Int                      @id @default(autoincrement())
+  publicId          String?                  @unique
+  name              String
+  phone             String
+  visitDate         DateTime                 @db.Date
+  adults            Int                      @default(1)
+  children          Int                      @default(0)
+  comment           String?
+  status            BookingStatus            @default(NEW)
+  adminNote         String?
+  telegramMessageId String?
+  telegramMessages  BookingTelegramMessage[]
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+
+  @@index([visitDate])
+  @@index([status])
+  @@index([phone])
+  @@index([createdAt])
+}
+
+model BookingTelegramMessage {
+  id        String   @id @default(cuid())
+  bookingId Int
+  chatId    String
+  messageId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([chatId, messageId])
+  @@index([bookingId])
+}
+
+model AdminUser {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String
+  sessions     AdminSession[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model AdminSession {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
