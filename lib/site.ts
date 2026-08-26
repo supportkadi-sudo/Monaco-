@@ -7,8 +7,6 @@ export const site = {
   hours: '06:00 — 23:00',
   instagram: '@monaco.aquapark',
   instagramUrl: 'https://www.instagram.com/monaco.aquapark/',
-  bookingTelegram: '@djgjeigje',
-  bookingTelegramUrl: 'https://t.me/djgjeigje',
   routeUrl: 'https://www.google.com/maps/search/?api=1&query=Monaco+Aquapark+Tashkent',
   mapEmbedUrl: 'https://www.google.com/maps?q=Monaco+Aquapark+Tashkent&output=embed'
 } as const;
