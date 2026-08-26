@@ -13,10 +13,10 @@ bot.use(async (ctx, next) => {
   const chatId = ctx.chat?.id ? String(ctx.chat.id) : '';
   const userId = ctx.from?.id ? String(ctx.from.id) : '';
 
-  // Admin IDs are expected to be private Telegram chat/user IDs. Requiring both
-  // values prevents an arbitrary member of an allowed group chat from using
-  // administrative callbacks.
-  if (!allowedAdmins.has(chatId) || !allowedAdmins.has(userId)) return;
+  // TELEGRAM_ADMIN_CHAT_IDS intentionally represents private admin chats.
+  // Requiring chatId === userId prevents an arbitrary member of an allowed
+  // group chat from changing booking statuses.
+  if (!chatId || !userId || chatId !== userId || !allowedAdmins.has(userId)) return;
   await next();
 });
 
