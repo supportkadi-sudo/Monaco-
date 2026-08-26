@@ -1,5 +1,9 @@
 /* Small visual refinements layered after the main stylesheet. */
 
+.hero-wire {
+  display: none;
+}
+
 .footer-inner {
   grid-template-columns: minmax(180px, 1fr) auto auto auto;
   align-items: start;
