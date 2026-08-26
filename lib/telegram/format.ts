@@ -27,6 +27,7 @@ export function bookingTelegramText(booking: Booking) {
     '',
     `<b>Имя:</b> ${esc(booking.name)}`,
     `<b>Телефон:</b> <code>${esc(booking.phone)}</code>`,
+    `<b>Telegram:</b> ${booking.telegram ? esc(booking.telegram) : '—'}`,
     `<b>Дата:</b> ${visit}`,
     `<b>Взрослых:</b> ${booking.adults}`,
     `<b>Детей:</b> ${booking.children}`,
