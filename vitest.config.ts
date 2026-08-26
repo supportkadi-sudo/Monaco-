@@ -5,7 +5,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    restoreMocks: true
+    restoreMocks: true,
+    include: ['tests/**/*.test.ts'],
+    exclude: ['tests/e2e/**', 'node_modules/**']
   },
   resolve: {
     alias: {
