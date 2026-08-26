@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { tashkentDateKey } from '@/lib/date';
 
 const uzPhone = /^\+?998\d{9}$/;
 
@@ -13,12 +14,7 @@ export const bookingInputSchema = z.object({
   visitDate: z
     .string()
     .refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), 'Укажите дату')
-    .refine((value) => {
-      const selected = new Date(`${value}T00:00:00+05:00`);
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      return !Number.isNaN(selected.getTime()) && selected >= now;
-    }, 'Дата посещения не может быть в прошлом'),
+    .refine((value) => value >= tashkentDateKey(), 'Дата посещения не может быть в прошлом'),
   adults: z.coerce.number().int().min(0).max(30),
   children: z.coerce.number().int().min(0).max(30),
   comment: z.string().trim().max(1000).optional().or(z.literal('')),
