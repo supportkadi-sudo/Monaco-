@@ -20,7 +20,6 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/components ./components
-COPY --from=builder /app/features ./features
 COPY --from=builder /app/lib ./lib
 COPY --from=builder /app/bot ./bot
 COPY --from=builder /app/package.json ./package.json
