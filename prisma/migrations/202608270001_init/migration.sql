@@ -5,6 +5,7 @@ CREATE TABLE "Booking" (
     "publicId" TEXT,
     "name" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
+    "telegram" TEXT,
     "visitDate" DATE NOT NULL,
     "adults" INTEGER NOT NULL DEFAULT 1,
     "children" INTEGER NOT NULL DEFAULT 0,
@@ -48,6 +49,7 @@ CREATE UNIQUE INDEX "Booking_publicId_key" ON "Booking"("publicId");
 CREATE INDEX "Booking_visitDate_idx" ON "Booking"("visitDate");
 CREATE INDEX "Booking_status_idx" ON "Booking"("status");
 CREATE INDEX "Booking_phone_idx" ON "Booking"("phone");
+CREATE INDEX "Booking_telegram_idx" ON "Booking"("telegram");
 CREATE INDEX "Booking_createdAt_idx" ON "Booking"("createdAt");
 CREATE UNIQUE INDEX "BookingTelegramMessage_chatId_messageId_key" ON "BookingTelegramMessage"("chatId", "messageId");
 CREATE INDEX "BookingTelegramMessage_bookingId_idx" ON "BookingTelegramMessage"("bookingId");
