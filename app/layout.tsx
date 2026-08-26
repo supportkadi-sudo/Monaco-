@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Manrope } from 'next/font/google';
 import './globals.css';
+import './mobile-polish.css';
 
 const serif = Cormorant_Garamond({
   subsets: ['cyrillic', 'latin'],
@@ -33,6 +34,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
   themeColor: '#faf9f6',
   colorScheme: 'light'
 };
