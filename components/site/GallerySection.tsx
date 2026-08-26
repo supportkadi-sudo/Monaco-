@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { media } from '@/lib/site';
 
 const items = [
@@ -14,16 +14,29 @@ const items = [
 
 export function GallerySection() {
   const [active, setActive] = useState<number | null>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (active === null) return;
+
+    previouslyFocused.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setActive(null);
       if (event.key === 'ArrowRight') setActive((value) => value === null ? null : (value + 1) % items.length);
       if (event.key === 'ArrowLeft') setActive((value) => value === null ? null : (value - 1 + items.length) % items.length);
     };
+
     document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused.current?.focus();
+    };
   }, [active]);
 
   return (
@@ -47,7 +60,7 @@ export function GallerySection() {
 
       {active !== null ? (
         <div className="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр фотографии" onClick={() => setActive(null)}>
-          <button className="lightbox-close" aria-label="Закрыть" onClick={() => setActive(null)}>×</button>
+          <button ref={closeRef} className="lightbox-close" aria-label="Закрыть" onClick={() => setActive(null)}>×</button>
           <Image src={items[active].src} alt={items[active].alt} width={1400} height={1000} onClick={(event) => event.stopPropagation()} />
         </div>
       ) : null}
