@@ -11,7 +11,12 @@ const bot = new Bot(token);
 
 bot.use(async (ctx, next) => {
   const chatId = ctx.chat?.id ? String(ctx.chat.id) : '';
-  if (!allowedAdmins.has(chatId)) return;
+  const userId = ctx.from?.id ? String(ctx.from.id) : '';
+
+  // Admin IDs are expected to be private Telegram chat/user IDs. Requiring both
+  // values prevents an arbitrary member of an allowed group chat from using
+  // administrative callbacks.
+  if (!allowedAdmins.has(chatId) || !allowedAdmins.has(userId)) return;
   await next();
 });
 
