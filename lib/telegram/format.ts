@@ -1,4 +1,5 @@
 import type { Booking, BookingStatus } from '@prisma/client';
+import { telegramProfileUrl } from '@/lib/telegram/contact';
 
 const labels: Record<BookingStatus, string> = {
   NEW: '🆕 Новая',
@@ -21,13 +22,19 @@ export function bookingTelegramText(booking: Booking) {
     dateStyle: 'long',
     timeZone: 'Asia/Tashkent'
   }).format(booking.visitDate);
+  const telegramUrl = telegramProfileUrl(booking.telegram);
+  const telegram = booking.telegram
+    ? telegramUrl
+      ? `<a href="${telegramUrl}">${esc(booking.telegram)}</a>`
+      : esc(booking.telegram)
+    : '—';
 
   return [
     `<b>${labels[booking.status]} заявка #${booking.publicId ?? booking.id}</b>`,
     '',
     `<b>Имя:</b> ${esc(booking.name)}`,
     `<b>Телефон:</b> <code>${esc(booking.phone)}</code>`,
-    `<b>Telegram:</b> ${booking.telegram ? esc(booking.telegram) : '—'}`,
+    `<b>Telegram:</b> ${telegram}`,
     `<b>Дата:</b> ${visit}`,
     `<b>Взрослых:</b> ${booking.adults}`,
     `<b>Детей:</b> ${booking.children}`,
