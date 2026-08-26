@@ -1,4 +1,4 @@
-import { BookingStatus } from '@prisma/client';
+import { BookingStatus, Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAdmin } from '@/lib/auth';
@@ -16,7 +16,7 @@ export async function PATCH(
 
   const { id } = await context.params;
   const bookingId = Number(id);
-  if (!Number.isInteger(bookingId)) {
+  if (!Number.isInteger(bookingId) || bookingId < 1) {
     return NextResponse.json({ ok: false, message: 'Некорректный ID' }, { status: 400 });
   }
 
@@ -34,7 +34,11 @@ export async function PATCH(
     }
     return NextResponse.json({ ok: true, status: booking.status });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ ok: false, message: 'Заявка не найдена' }, { status: 404 });
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      return NextResponse.json({ ok: false, message: 'Заявка не найдена' }, { status: 404 });
+    }
+
+    console.error('Booking status update failed', error);
+    return NextResponse.json({ ok: false, message: 'Не удалось изменить статус' }, { status: 500 });
   }
 }
