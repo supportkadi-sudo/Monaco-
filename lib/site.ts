@@ -4,7 +4,7 @@ export const site = {
   phoneHref: 'tel:+998952151515',
   address: 'Ташкент, Мирзо-Улугбекский район, массив Карасу-4, ул. Гулсанам',
   shortAddress: 'Карасу-4, ул. Гулсанам',
-  hours: '06:00 — 23:00',
+  hours: 'Уточняйте по телефону',
   instagram: '@monaco.aquapark',
   instagramUrl: 'https://www.instagram.com/monaco.aquapark/',
   routeUrl: 'https://www.google.com/maps/search/?api=1&query=Monaco+Aquapark+Tashkent',
