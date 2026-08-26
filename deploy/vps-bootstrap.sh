@@ -120,7 +120,7 @@ EOF
 
 ln -sfn /etc/nginx/sites-available/${DOMAIN} /etc/nginx/sites-enabled/${DOMAIN}
 nginx -t
-systemctl reload nginx
+systemctl enable --now nginx
 
 read -r -p "Email for Let's Encrypt: " LE_EMAIL
 while [ -z "$LE_EMAIL" ]; do read -r -p "Let's Encrypt email is required: " LE_EMAIL; done
