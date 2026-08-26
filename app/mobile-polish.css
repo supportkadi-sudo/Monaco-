@@ -52,9 +52,22 @@
     font-size: 16px;
   }
 
+  .site-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    padding-inline: 17px;
+    z-index: 30;
+    border-bottom: 0;
+    background: linear-gradient(180deg, rgba(247, 246, 242, .82) 0%, rgba(247, 246, 242, .48) 72%, rgba(247, 246, 242, 0) 100%);
+  }
+
   .hero {
-    min-height: calc(100vh - 72px);
-    min-height: calc(100svh - 72px);
+    min-height: 100vh;
+    min-height: 100svh;
     isolation: isolate;
   }
 
@@ -62,7 +75,7 @@
     position: absolute;
     inset: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
     margin: 0;
   }
 
@@ -71,21 +84,21 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 60% center;
-    filter: saturate(.9) brightness(1.03);
+    object-position: 54% center;
+    filter: none;
   }
 
   .hero-media::after {
     background:
-      linear-gradient(180deg, rgba(247, 246, 242, .12) 0%, rgba(247, 246, 242, .18) 44%, rgba(247, 246, 242, .78) 100%),
-      linear-gradient(90deg, rgba(247, 246, 242, .86) 0%, rgba(247, 246, 242, .56) 48%, rgba(247, 246, 242, .08) 100%);
+      linear-gradient(180deg, rgba(247, 246, 242, .02) 0%, rgba(247, 246, 242, .04) 55%, rgba(247, 246, 242, .18) 100%),
+      linear-gradient(90deg, rgba(247, 246, 242, .52) 0%, rgba(247, 246, 242, .30) 43%, rgba(247, 246, 242, .04) 82%, rgba(247, 246, 242, 0) 100%);
   }
 
   .hero-content {
-    min-height: calc(100vh - 72px);
-    min-height: calc(100svh - 72px);
+    min-height: 100vh;
+    min-height: 100svh;
     justify-content: center;
-    padding: 48px 0 44px;
+    padding: 104px 0 82px;
   }
 
   .hero-title {
@@ -164,24 +177,28 @@
 }
 
 @media (max-width: 480px) {
-  .hero {
-    min-height: calc(100vh - 66px);
-    min-height: calc(100svh - 66px);
+  .site-header {
+    height: 66px;
+    padding-inline: 14px;
+  }
+
+  .hero,
+  .hero-content {
+    min-height: 100vh;
+    min-height: 100svh;
   }
 
   .hero-content {
-    min-height: calc(100vh - 66px);
-    min-height: calc(100svh - 66px);
-    padding: 38px 0 34px;
+    padding: 94px 0 78px;
   }
 
   .hero-media {
-    height: auto;
+    height: 100%;
   }
 
   .hero-media img,
   .hero-media video {
-    object-position: 61% center;
+    object-position: 55% center;
   }
 
   .hero-title {
