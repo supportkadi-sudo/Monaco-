@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { BookingStatus } from '@prisma/client';
 import { requireAdmin } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { telegramProfileUrl } from '@/lib/telegram/contact';
 import { BookingStatusActions } from '@/components/admin/BookingStatusActions';
 
 const statusNames: Record<BookingStatus, string> = {
@@ -20,6 +21,7 @@ export default async function AdminBookingPage({ params }: { params: Promise<{ i
 
   const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
   if (!booking) notFound();
+  const telegramUrl = telegramProfileUrl(booking.telegram);
 
   return (
     <div className="admin-shell">
@@ -33,7 +35,7 @@ export default async function AdminBookingPage({ params }: { params: Promise<{ i
           <p><strong>Статус:</strong> <span className={`status-pill status-${booking.status}`}>{statusNames[booking.status]}</span></p>
           <p><strong>Имя:</strong> {booking.name}</p>
           <p><strong>Телефон:</strong> <a href={`tel:${booking.phone}`}>{booking.phone}</a></p>
-          <p><strong>Telegram:</strong> {booking.telegram || '—'}</p>
+          <p><strong>Telegram:</strong> {booking.telegram ? (telegramUrl ? <a href={telegramUrl} target="_blank" rel="noreferrer">{booking.telegram}</a> : booking.telegram) : '—'}</p>
           <p><strong>Дата посещения:</strong> {new Intl.DateTimeFormat('ru-RU', { dateStyle: 'long', timeZone: 'UTC' }).format(booking.visitDate)}</p>
           <p><strong>Взрослых:</strong> {booking.adults}</p>
           <p><strong>Детей:</strong> {booking.children}</p>
