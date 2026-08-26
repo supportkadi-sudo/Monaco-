@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
+import { tashkentDateKey } from '@/lib/date';
 
 type FormState = {
   name: string;
@@ -30,11 +31,7 @@ export function BookingForm() {
   const [error, setError] = useState('');
   const [successId, setSuccessId] = useState<string | null>(null);
 
-  const today = useMemo(() => {
-    const now = new Date();
-    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
-    return local.toISOString().slice(0, 10);
-  }, []);
+  const today = useMemo(() => tashkentDateKey(), []);
 
   function setCount(key: 'adults' | 'children', delta: number) {
     setForm((current) => ({
@@ -45,6 +42,8 @@ export function BookingForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
+
     setLoading(true);
     setError('');
 
