@@ -25,13 +25,14 @@ describe('booking service', () => {
     }));
   });
 
-  it('creates a booking and assigns public number', async () => {
+  it('creates a booking, persists Telegram and assigns public number', async () => {
     mocks.create.mockResolvedValue({ id: 7 });
     mocks.updateTx.mockResolvedValue({ id: 7, publicId: '1007' });
 
     const result = await createBooking({
       name: 'Гость',
       phone: '+998901234567',
+      telegram: '@monaco_guest',
       visitDate: '2099-01-10',
       adults: 2,
       children: 1,
@@ -40,6 +41,9 @@ describe('booking service', () => {
     });
 
     expect(result.publicId).toBe('1007');
+    expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ telegram: '@monaco_guest' })
+    }));
     expect(mocks.updateTx).toHaveBeenCalledWith({ where: { id: 7 }, data: { publicId: '1007' } });
   });
 
