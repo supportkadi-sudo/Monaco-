@@ -2,6 +2,7 @@ import { BookingStatus, Prisma } from '@prisma/client';
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { telegramProfileUrl } from '@/lib/telegram/contact';
 import { BookingStatusActions } from '@/components/admin/BookingStatusActions';
 import { AdminLogoutButton } from '@/components/admin/AdminLogoutButton';
 
@@ -93,21 +94,24 @@ export default async function AdminPage({
               <tr><th>№</th><th>Создана</th><th>Посещение</th><th>Гость</th><th>Контакты</th><th>Гости</th><th>Статус</th><th>Действия</th></tr>
             </thead>
             <tbody>
-              {bookings.map((booking) => (
-                <tr key={booking.id}>
-                  <td><Link href={`/admin/bookings/${booking.id}`}>#{booking.publicId ?? booking.id}</Link></td>
-                  <td>{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Tashkent' }).format(booking.createdAt)}</td>
-                  <td>{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'medium', timeZone: 'UTC' }).format(booking.visitDate)}</td>
-                  <td>{booking.name}</td>
-                  <td>
-                    <a href={`tel:${booking.phone}`}>{booking.phone}</a>
-                    {booking.telegram ? <><br /><span>{booking.telegram}</span></> : null}
-                  </td>
-                  <td>{booking.adults} / {booking.children}</td>
-                  <td><span className={`status-pill status-${booking.status}`}>{statusNames[booking.status]}</span></td>
-                  <td><BookingStatusActions bookingId={booking.id} /></td>
-                </tr>
-              ))}
+              {bookings.map((booking) => {
+                const telegramUrl = telegramProfileUrl(booking.telegram);
+                return (
+                  <tr key={booking.id}>
+                    <td><Link href={`/admin/bookings/${booking.id}`}>#{booking.publicId ?? booking.id}</Link></td>
+                    <td>{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Tashkent' }).format(booking.createdAt)}</td>
+                    <td>{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'medium', timeZone: 'UTC' }).format(booking.visitDate)}</td>
+                    <td>{booking.name}</td>
+                    <td>
+                      <a href={`tel:${booking.phone}`}>{booking.phone}</a>
+                      {booking.telegram ? <><br />{telegramUrl ? <a href={telegramUrl} target="_blank" rel="noreferrer">{booking.telegram}</a> : booking.telegram}</> : null}
+                    </td>
+                    <td>{booking.adults} / {booking.children}</td>
+                    <td><span className={`status-pill status-${booking.status}`}>{statusNames[booking.status]}</span></td>
+                    <td><BookingStatusActions bookingId={booking.id} /></td>
+                  </tr>
+                );
+              })}
               {bookings.length === 0 ? <tr><td colSpan={8}>Заявок по выбранным фильтрам нет.</td></tr> : null}
             </tbody>
           </table>
