@@ -46,6 +46,7 @@ export default async function AdminPage({
   if (q) where.OR = [
     { name: { contains: q, mode: 'insensitive' } },
     { phone: { contains: q } },
+    { telegram: { contains: q, mode: 'insensitive' } },
     { publicId: { contains: q } }
   ];
 
@@ -75,7 +76,7 @@ export default async function AdminPage({
         </section>
 
         <form className="admin-filters" method="get">
-          <input name="q" defaultValue={q} placeholder="Имя, телефон или № заявки" aria-label="Поиск" />
+          <input name="q" defaultValue={q} placeholder="Имя, телефон, Telegram или № заявки" aria-label="Поиск" />
           <input name="date" type="date" defaultValue={date} aria-label="Дата посещения" />
           <select name="status" defaultValue={status || ''} aria-label="Статус">
             <option value="">Все статусы</option>
@@ -89,7 +90,7 @@ export default async function AdminPage({
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
-              <tr><th>№</th><th>Создана</th><th>Посещение</th><th>Гость</th><th>Телефон</th><th>Гости</th><th>Статус</th><th>Действия</th></tr>
+              <tr><th>№</th><th>Создана</th><th>Посещение</th><th>Гость</th><th>Контакты</th><th>Гости</th><th>Статус</th><th>Действия</th></tr>
             </thead>
             <tbody>
               {bookings.map((booking) => (
@@ -98,7 +99,10 @@ export default async function AdminPage({
                   <td>{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Tashkent' }).format(booking.createdAt)}</td>
                   <td>{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'medium', timeZone: 'UTC' }).format(booking.visitDate)}</td>
                   <td>{booking.name}</td>
-                  <td><a href={`tel:${booking.phone}`}>{booking.phone}</a></td>
+                  <td>
+                    <a href={`tel:${booking.phone}`}>{booking.phone}</a>
+                    {booking.telegram ? <><br /><span>{booking.telegram}</span></> : null}
+                  </td>
                   <td>{booking.adults} / {booking.children}</td>
                   <td><span className={`status-pill status-${booking.status}`}>{statusNames[booking.status]}</span></td>
                   <td><BookingStatusActions bookingId={booking.id} /></td>
