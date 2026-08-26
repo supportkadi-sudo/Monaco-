@@ -5,6 +5,7 @@ import { FormEvent, useMemo, useState } from 'react';
 type FormState = {
   name: string;
   phone: string;
+  telegram: string;
   visitDate: string;
   adults: number;
   children: number;
@@ -15,6 +16,7 @@ type FormState = {
 const initialState: FormState = {
   name: '',
   phone: '+998 ',
+  telegram: '',
   visitDate: '',
   adults: 2,
   children: 0,
@@ -82,6 +84,10 @@ export function BookingForm() {
       <div className="field">
         <label htmlFor="booking-phone">Телефон</label>
         <input id="booking-phone" name="phone" inputMode="tel" autoComplete="tel" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+998 90 123 45 67" />
+      </div>
+      <div className="field field--full">
+        <label htmlFor="booking-telegram">Telegram <span aria-hidden="true">(необязательно)</span></label>
+        <input id="booking-telegram" name="telegram" autoComplete="off" value={form.telegram} onChange={(e) => setForm({ ...form, telegram: e.target.value })} placeholder="@username" />
       </div>
       <div className="field field--full">
         <label htmlFor="booking-date">Дата посещения</label>
