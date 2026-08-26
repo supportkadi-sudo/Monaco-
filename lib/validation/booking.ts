@@ -15,6 +15,15 @@ function normalizeTelegram(value: string) {
   return withoutUrl ? `@${withoutUrl}` : '';
 }
 
+function isValidDateKey(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year
+    && date.getUTCMonth() === month - 1
+    && date.getUTCDate() === day;
+}
+
 export const bookingInputSchema = z.object({
   name: z.string().trim().min(2, 'Укажите имя').max(80),
   phone: z
@@ -32,8 +41,8 @@ export const bookingInputSchema = z.object({
     .refine((value) => !value || telegramUsername.test(value.slice(1)), 'Введите Telegram в формате @username'),
   visitDate: z
     .string()
-    .refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), 'Укажите дату')
-    .refine((value) => value >= tashkentDateKey(), 'Дата посещения не может быть в прошлом'),
+    .refine(isValidDateKey, 'Укажите корректную дату')
+    .refine((value) => !isValidDateKey(value) || value >= tashkentDateKey(), 'Дата посещения не может быть в прошлом'),
   adults: z.coerce.number().int().min(0).max(30),
   children: z.coerce.number().int().min(0).max(30),
   comment: z.string().trim().max(1000).optional().or(z.literal('')),
