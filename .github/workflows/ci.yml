@@ -1,10 +1,10 @@
 name: MVP CI
 
+# GitHub Actions minutes are currently exhausted for this repository.
+# Keep the full verification workflow available, but do not run it automatically.
+# Re-enable push/pull_request triggers when limits are restored.
 on:
-  push:
-    branches: [main, feat/mvp]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   verify:
