@@ -1,5 +1,6 @@
 import { Bot } from 'grammy';
 import { updateBookingStatus } from '@/lib/booking/service';
+import { isAuthorizedTelegramAdmin } from '@/lib/telegram/admin';
 import { callbackPattern, parseBookingCallback } from '@/lib/telegram/callback';
 import { syncBookingTelegramMessages, telegramAdminIds } from '@/lib/telegram/notify';
 
@@ -10,13 +11,12 @@ const allowedAdmins = new Set(telegramAdminIds());
 const bot = new Bot(token);
 
 bot.use(async (ctx, next) => {
-  const chatId = ctx.chat?.id ? String(ctx.chat.id) : '';
-  const userId = ctx.from?.id ? String(ctx.from.id) : '';
+  const chatId = ctx.chat?.id ? String(ctx.chat.id) : undefined;
+  const userId = ctx.from?.id ? String(ctx.from.id) : undefined;
 
   // TELEGRAM_ADMIN_CHAT_IDS intentionally represents private admin chats.
-  // Requiring chatId === userId prevents an arbitrary member of an allowed
-  // group chat from changing booking statuses.
-  if (!chatId || !userId || chatId !== userId || !allowedAdmins.has(userId)) return;
+  // This prevents arbitrary members of an allowed group chat from changing statuses.
+  if (!isAuthorizedTelegramAdmin(chatId, userId, allowedAdmins)) return;
   await next();
 });
 
