@@ -14,6 +14,7 @@ test('desktop: public site, booking and admin status flow', async ({ page }, tes
   await page.locator('#booking').scrollIntoViewIfNeeded();
   await page.getByLabel('Имя').fill('E2E Гость');
   await page.getByLabel('Телефон').fill('+998 90 123 45 67');
+  await page.getByLabel(/Telegram/).fill('https://t.me/e2e_monaco_guest');
   await page.getByLabel('Дата посещения').fill('2099-01-10');
   await page.getByLabel('Комментарий').fill('Автоматическая проверка заявки');
   await page.getByRole('button', { name: 'Оставить заявку' }).click();
@@ -29,6 +30,7 @@ test('desktop: public site, booking and admin status flow', async ({ page }, tes
 
   const row = page.locator('tr').filter({ hasText: 'E2E Гость' }).first();
   await expect(row).toBeVisible();
+  await expect(row).toContainText('@e2e_monaco_guest');
   await row.getByRole('button', { name: 'Подтвердить' }).click();
   await expect(row.getByText('Подтверждена')).toBeVisible();
 });
