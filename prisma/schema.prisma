@@ -19,6 +19,7 @@ model Booking {
   publicId          String?                  @unique
   name              String
   phone             String
+  telegram          String?
   visitDate         DateTime                 @db.Date
   adults            Int                      @default(1)
   children          Int                      @default(0)
@@ -33,6 +34,7 @@ model Booking {
   @@index([visitDate])
   @@index([status])
   @@index([phone])
+  @@index([telegram])
   @@index([createdAt])
 }
 
