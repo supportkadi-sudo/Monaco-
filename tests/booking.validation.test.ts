@@ -39,6 +39,16 @@ describe('bookingInputSchema', () => {
     })).toThrow();
   });
 
+  it('rejects impossible calendar dates', () => {
+    expect(() => bookingInputSchema.parse({
+      name: 'Тестовый гость',
+      phone: '+998901234567',
+      visitDate: '2099-02-31',
+      adults: 1,
+      children: 0
+    })).toThrow();
+  });
+
   it('rejects invalid phone, empty party and honeypot', () => {
     expect(() => bookingInputSchema.parse({
       name: 'A', phone: '123', visitDate: '2099-01-10', adults: 0, children: 0, website: 'spam'
