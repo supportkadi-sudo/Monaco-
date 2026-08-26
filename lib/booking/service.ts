@@ -16,6 +16,7 @@ export async function createBooking(input: BookingInput) {
       data: {
         name: input.name,
         phone: input.phone,
+        telegram: input.telegram || null,
         visitDate: visitDateToDate(input.visitDate),
         adults: input.adults,
         children: input.children,
