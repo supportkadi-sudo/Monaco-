@@ -32,7 +32,9 @@ test('responsive: no horizontal overflow across target widths', async ({ page },
 
     expect(metrics.scrollWidth, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(metrics.clientWidth + 1);
     await expect(page.getByRole('heading', { name: /MONACO\s*AQUAPARK/i })).toBeVisible();
-    await expect(page.locator('.site-header .brand-logo img')).toBeVisible();
+    const logo = page.locator('.site-header .brand-logo img');
+    await expect(logo).toBeVisible();
+    await expect(logo).toHaveAttribute('src', /logo\.webp/);
     await expect(page.getByRole('link', { name: 'Забронировать' }).first()).toBeVisible();
   }
 });
