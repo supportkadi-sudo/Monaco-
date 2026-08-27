@@ -25,6 +25,7 @@ export function ZonesSection() {
             <Image src={media.pool} alt="Бассейн Monaco Aquapark в Ташкенте" fill sizes="(max-width: 820px) 100vw, 50vw" />
           </div>
 
+          {/* Keep the real Monaco image until Monaco provides a clearly verified child-zone photograph. */}
           <div className="zone-media zone-media--tall zone-two">
             <Image src={media.ship} alt="Корабль в бассейне Monaco Aquapark" fill sizes="(max-width: 820px) 100vw, 50vw" />
           </div>
