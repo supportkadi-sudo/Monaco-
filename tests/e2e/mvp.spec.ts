@@ -9,6 +9,8 @@ test('desktop: public site, booking and admin status flow', async ({ page }, tes
 
   await page.locator('.gallery-item').first().click();
   await expect(page.locator('.lightbox')).toBeVisible();
+  await page.getByRole('button', { name: 'Следующее фото' }).click();
+  await expect(page.locator('.lightbox-count')).toContainText('2 / 5');
   await page.getByRole('button', { name: 'Закрыть' }).click();
 
   await page.locator('#booking').scrollIntoViewIfNeeded();
@@ -16,6 +18,7 @@ test('desktop: public site, booking and admin status flow', async ({ page }, tes
   await page.getByLabel('Телефон').fill('+998 90 123 45 67');
   await page.getByLabel(/Telegram/).fill('https://t.me/e2e_monaco_guest');
   await page.getByLabel('Дата посещения').fill('2099-01-10');
+  await expect(page.locator('.booking-estimate')).toContainText('360 000 сум');
   await page.getByLabel('Комментарий').fill('Автоматическая проверка заявки');
   await page.getByRole('button', { name: 'Оставить заявку' }).click();
   await expect(page.getByRole('heading', { name: 'Заявка принята' })).toBeVisible();
@@ -35,11 +38,19 @@ test('desktop: public site, booking and admin status flow', async ({ page }, tes
   await expect(row.getByText('Подтверждена')).toBeVisible();
 });
 
-test('mobile: composition and fixed CTA', async ({ page }, testInfo) => {
+test('mobile: hero, menu and delayed fixed CTA', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile');
 
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /MONACO\s*AQUAPARK/i })).toBeVisible();
+  await expect(page.locator('.mobile-cta')).toBeHidden();
+
+  await page.getByRole('button', { name: 'Открыть меню' }).click();
+  await expect(page.getByRole('dialog', { name: 'Навигация Monaco Aquapark' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Instagram' })).toBeVisible();
+  await page.getByRole('button', { name: 'Закрыть меню' }).last().click();
+
+  await page.locator('#prices').scrollIntoViewIfNeeded();
   await expect(page.locator('.mobile-cta')).toBeVisible();
   await expect(page.locator('.mobile-cta').getByText('Позвонить')).toBeVisible();
   await expect(page.locator('.mobile-cta').getByText('Забронировать')).toBeVisible();
