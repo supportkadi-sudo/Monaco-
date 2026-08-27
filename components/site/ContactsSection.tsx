@@ -10,6 +10,7 @@ export function ContactsSection() {
           <div className="contact-list">
             <div><div className="contact-label">Адрес</div><div className="contact-value">{site.address}</div></div>
             <div><div className="contact-label">Телефон</div><a className="contact-value" href={site.phoneHref}>{site.phone}</a></div>
+            <div><div className="contact-label">Email</div><a className="contact-value" href={site.emailHref}>{site.email}</a></div>
             <div><div className="contact-label">Instagram</div><a className="contact-value" href={site.instagramUrl} target="_blank" rel="noreferrer">{site.instagram}</a></div>
             <div><div className="contact-label">Режим работы</div><div className="contact-value">{site.hours}</div></div>
           </div>
