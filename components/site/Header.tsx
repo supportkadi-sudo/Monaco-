@@ -13,7 +13,6 @@ export function Header() {
         <a href="#zones">Зоны</a>
         <a href="#prices">Цены</a>
         <a href="#gallery">Галерея</a>
-        <a href="#before-visit">Перед посещением</a>
         <a href="#contacts">Контакты</a>
       </nav>
       <div className="header-actions">
