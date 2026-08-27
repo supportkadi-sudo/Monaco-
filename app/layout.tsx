@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Manrope } from 'next/font/google';
 import './globals.css';
 import './mobile-polish.css';
+import './gallery-mobile-fix.css';
 
 const serif = Cormorant_Garamond({
   subsets: ['cyrillic', 'latin'],
