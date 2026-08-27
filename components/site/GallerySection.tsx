@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { media, site } from '@/lib/site';
+import styles from './GallerySection.module.css';
 
 type GallerySlot = 'pool' | 'ship' | 'sauna' | 'hero' | 'party';
 
@@ -84,10 +85,12 @@ export function GallerySection() {
             <a className="gallery-instagram" href={site.instagramUrl} target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗</span></a>
           </div>
         </div>
-        <div className="gallery-grid">
+        <div className={`gallery-grid ${styles.mobileGrid}`}>
           {items.map((item, index) => {
             const className = [
               'gallery-item',
+              styles.item,
+              styles[item.slot],
               `gallery-item--${item.slot}`,
               item.mobileFeatured ? 'gallery-item--mobile-featured' : '',
               item.party ? 'gallery-item--party' : ''
