@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { media, site } from '@/lib/site';
 
 const items = [
@@ -19,9 +19,9 @@ export function GallerySection() {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
-  function move(delta: number) {
+  const move = useCallback((delta: number) => {
     setActive((value) => value === null ? null : (value + delta + items.length) % items.length);
-  }
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -59,7 +59,7 @@ export function GallerySection() {
       document.body.style.overflow = previousOverflow;
       previouslyFocused.current?.focus();
     };
-  }, [isOpen]);
+  }, [isOpen, move]);
 
   return (
     <section className="section" id="gallery">
