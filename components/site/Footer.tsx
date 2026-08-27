@@ -14,6 +14,7 @@ export function Footer() {
           <a href="#zones">Зоны</a>
           <a href="#prices">Цены</a>
           <a href="#gallery">Галерея</a>
+          <a href="#before-visit">Перед посещением</a>
           <a href="#contacts">Контакты</a>
         </nav>
 
@@ -32,20 +33,12 @@ export function Footer() {
 
         <div className="footer-meta">
           <div><a href={site.phoneHref}>{site.phone}</a></div>
+          <div><a href={site.emailHref}>{site.email}</a></div>
           <div>{site.shortAddress}</div>
           <div>{site.hours}</div>
           <div><a href={site.instagramUrl} target="_blank" rel="noreferrer">{site.instagram}</a></div>
         </div>
       </div>
     </footer>
-  );
-}
-
-export function MobileCta() {
-  return (
-    <div className="mobile-cta" aria-label="Быстрые действия">
-      <a href={site.phoneHref}>Позвонить</a>
-      <a href="#booking">Забронировать</a>
-    </div>
   );
 }
