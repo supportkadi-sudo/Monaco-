@@ -15,6 +15,7 @@ const navigation = [
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -22,12 +23,29 @@ export function MobileMenu() {
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    firstLinkRef.current?.focus();
+    requestAnimationFrame(() => firstLinkRef.current?.focus());
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setOpen(false);
         requestAnimationFrame(() => toggleRef.current?.focus());
+        return;
+      }
+
+      if (event.key === 'Tab' && panelRef.current) {
+        const focusable = Array.from(panelRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]'))
+          .filter((element) => element.offsetParent !== null);
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (!first || !last) return;
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
 
@@ -60,7 +78,7 @@ export function MobileMenu() {
 
       <div className={`mobile-menu-layer${open ? ' is-open' : ''}`} aria-hidden={!open}>
         <button className="mobile-menu-backdrop" type="button" tabIndex={-1} aria-label="Закрыть меню" onClick={closeAndReturnFocus} />
-        <div className="mobile-menu-panel" id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Навигация Monaco Aquapark">
+        <div ref={panelRef} className="mobile-menu-panel" id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Навигация Monaco Aquapark">
           <div className="mobile-menu-head">
             <span className="mobile-menu-caption">Навигация</span>
             <button className="mobile-menu-close" type="button" aria-label="Закрыть меню" onClick={closeAndReturnFocus}>×</button>
