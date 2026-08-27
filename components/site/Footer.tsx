@@ -1,12 +1,12 @@
 import { site } from '@/lib/site';
+import { BrandLogo } from './BrandLogo';
 
 export function Footer() {
   return (
     <footer className="footer">
       <div className="container footer-inner">
-        <a className="logo" href="#top">
-          <span className="logo-main">MONACO</span>
-          <span className="logo-sub">AQUAPARK</span>
+        <a className="logo footer-logo" href="#top" aria-label="Monaco Aquapark — наверх">
+          <BrandLogo />
         </a>
 
         <nav className="footer-nav" aria-label="Навигация в подвале">
