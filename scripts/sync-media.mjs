@@ -30,35 +30,78 @@ function absoluteUrl(value) {
 
 function svgAspectRatio(svg) {
   const viewBox = svg.match(/viewBox=["']\s*([\d.-]+)\s+([\d.-]+)\s+([\d.-]+)\s+([\d.-]+)\s*["']/i);
-  if (!viewBox) return 0;
-  const width = Number(viewBox[3]);
-  const height = Number(viewBox[4]);
+  if (viewBox) {
+    const width = Number(viewBox[3]);
+    const height = Number(viewBox[4]);
+    if (width > 0 && height > 0) return width / height;
+  }
+
+  const width = Number(svg.match(/\bwidth=["']([\d.]+)/i)?.[1]);
+  const height = Number(svg.match(/\bheight=["']([\d.]+)/i)?.[1]);
   return width > 0 && height > 0 ? width / height : 0;
+}
+
+function looksLikeLogoUrl(url) {
+  try {
+    const parsed = new URL(url);
+    const filename = parsed.pathname.split('/').pop() || '';
+    return /(?:logo|brand)/i.test(filename) || /\/(?:logo|brand)(?:s)?\//i.test(parsed.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function extractSvgUrls(fragment) {
+  const values = [];
+  for (const match of fragment.matchAll(/(?:src|href|data-src|data)=['"]([^'"]+\.svg(?:[?#][^'"]*)?)['"]/gi)) {
+    values.push(match[1]);
+  }
+  for (const match of fragment.matchAll(/url\((?:['"])?([^)'"\s]+\.svg(?:[?#][^)'"\s]*)?)(?:['"])?\)/gi)) {
+    values.push(match[1]);
+  }
+  return values;
+}
+
+async function validateExternalLogo(url) {
+  try {
+    const response = await fetch(url, { headers: { 'user-agent': userAgent } });
+    if (!response.ok) return null;
+    const svg = await response.text();
+    if (!/<svg\b/i.test(svg)) return null;
+
+    const ratio = svgAspectRatio(svg);
+    if (ratio < 2 || ratio > 10) return null;
+    return { svg, source: url, ratio };
+  } catch {
+    return null;
+  }
 }
 
 async function discoverOfficialLogoSvg() {
   const html = await fetchText(officialSite);
-  const header = html.match(/<header\b[\s\S]*?<\/header>/i)?.[0] || html.slice(0, 50000);
+  const header = html.match(/<header\b[\s\S]*?<\/header>/i)?.[0] || html.slice(0, 60000);
   const candidates = [];
 
-  const addCandidate = (raw) => {
+  // First inspect markup explicitly identified as a logo/brand container. This avoids
+  // treating decorative hero icons such as hero/ico01.svg as the Monaco logo.
+  const brandFragments = [
+    ...header.matchAll(/<[^>]+(?:class|id)=['"][^'"]*(?:logo|brand)[^'"]*['"][^>]*>[\s\S]{0,5000}?<\/[^>]+>/gi)
+  ].map((match) => match[0]);
+
+  for (const fragment of brandFragments) {
+    for (const raw of extractSvgUrls(fragment)) {
+      const url = absoluteUrl(raw?.trim());
+      if (url) candidates.push(url);
+    }
+  }
+
+  // Then accept only URLs whose own filename/path identifies them as a logo/brand.
+  for (const raw of extractSvgUrls(header)) {
     const url = absoluteUrl(raw?.trim());
-    if (!url || !/\.svg(?:[?#].*)?$/i.test(url)) return;
-    if (!/logo|brand|monaco/i.test(url)) return;
-    candidates.push(url);
-  };
-
-  for (const match of header.matchAll(/(?:src|href|data-src|data)=['"]([^'"]+\.svg(?:[?#][^'"]*)?)['"]/gi)) {
-    addCandidate(match[1]);
-  }
-  for (const match of html.matchAll(/(?:src|href|data-src|data)=['"]([^'"]*(?:logo|brand|monaco)[^'"]*\.svg(?:[?#][^'"]*)?)['"]/gi)) {
-    addCandidate(match[1]);
-  }
-  for (const match of header.matchAll(/url\((?:['"])?([^)'"\s]+\.svg(?:[?#][^)'"\s]*)?)(?:['"])?\)/gi)) {
-    addCandidate(match[1]);
+    if (url && looksLikeLogoUrl(url)) candidates.push(url);
   }
 
-  // Theme fallbacks are only used if the current HTML does not expose the asset directly.
+  // Conservative theme fallbacks. Each candidate is fetched and aspect-ratio checked.
   candidates.push(
     'https://monaqua.uz/wp-content/themes/monaco/assets/img/logo.svg',
     'https://monaqua.uz/wp-content/themes/monaco/assets/img/header/logo.svg',
@@ -66,26 +109,27 @@ async function discoverOfficialLogoSvg() {
   );
 
   for (const url of [...new Set(candidates)]) {
-    try {
-      const response = await fetch(url, { headers: { 'user-agent': userAgent } });
-      if (!response.ok) continue;
-      const svg = await response.text();
-      if (!/<svg\b/i.test(svg)) continue;
-      return { svg, source: url };
-    } catch {}
+    const validated = await validateExternalLogo(url);
+    if (validated) return validated;
   }
 
+  // Some WordPress themes inline the brand SVG in the header rather than reference a file.
+  // Prefer a wide SVG, which matches the horizontal Monaco wordmark rather than UI icons.
   const inlineSvgs = [...header.matchAll(/<svg\b[\s\S]*?<\/svg>/gi)].map((match) => match[0]);
   const wideInlineLogo = inlineSvgs
-    .map((svg) => ({ svg, ratio: svgAspectRatio(svg) }))
-    .filter((item) => item.ratio >= 2.2)
-    .sort((a, b) => b.ratio - a.ratio)[0];
+    .map((svg) => ({ svg, ratio: svgAspectRatio(svg), size: svg.length }))
+    .filter((item) => item.ratio >= 2 && item.ratio <= 10)
+    .sort((a, b) => b.size - a.size)[0];
 
   if (wideInlineLogo) {
-    return { svg: wideInlineLogo.svg, source: `${officialSite} (inline header SVG)` };
+    return {
+      svg: wideInlineLogo.svg,
+      source: `${officialSite} (inline header SVG)`,
+      ratio: wideInlineLogo.ratio
+    };
   }
 
-  throw new Error('Could not discover the official Monaco logo SVG on monaqua.uz');
+  throw new Error('Could not discover a verified wide Monaco logo SVG on monaqua.uz');
 }
 
 await mkdir(targetDir, { recursive: true });
@@ -107,13 +151,14 @@ for (const [name, url] of Object.entries(files)) {
   console.log(`Saved ${name} (${bytes.length} bytes)`);
 }
 
+// Always re-discover and replace the logo during media sync. The logo is tiny, and this
+// prevents a previously misidentified decorative SVG from remaining cached indefinitely.
 const logoDestination = path.join(targetDir, 'logo.svg');
-try {
-  await access(logoDestination);
-  console.log('Media exists: logo.svg');
-} catch {
-  const { svg, source } = await discoverOfficialLogoSvg();
-  await writeFile(logoDestination, svg, 'utf8');
-  await writeFile(brandSourceFile, `${JSON.stringify({ source, syncedAt: new Date().toISOString() }, null, 2)}\n`, 'utf8');
-  console.log(`Saved logo.svg from official source: ${source}`);
-}
+const { svg, source, ratio } = await discoverOfficialLogoSvg();
+await writeFile(logoDestination, svg, 'utf8');
+await writeFile(
+  brandSourceFile,
+  `${JSON.stringify({ source, aspectRatio: ratio, syncedAt: new Date().toISOString() }, null, 2)}\n`,
+  'utf8'
+);
+console.log(`Saved verified logo.svg from official source: ${source} (ratio ${ratio.toFixed(2)})`);
