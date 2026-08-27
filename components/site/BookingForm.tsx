@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { tashkentDateKey } from '@/lib/date';
+import { prices } from '@/lib/site';
 import { bookingInputSchema } from '@/lib/validation/booking';
 
 type FormState = {
@@ -26,6 +27,17 @@ const initialState: FormState = {
   website: ''
 };
 
+function money(value: number) {
+  return `${new Intl.NumberFormat('ru-RU').format(value)} сум`;
+}
+
+function isWeekend(dateKey: string) {
+  const [year, month, day] = dateKey.split('-').map(Number);
+  if (!year || !month || !day) return false;
+  const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  return weekday === 0 || weekday === 6;
+}
+
 export function BookingForm() {
   const [form, setForm] = useState<FormState>(initialState);
   const [loading, setLoading] = useState(false);
@@ -33,6 +45,11 @@ export function BookingForm() {
   const [successId, setSuccessId] = useState<string | null>(null);
 
   const today = useMemo(() => tashkentDateKey(), []);
+  const estimate = useMemo(() => {
+    if (!form.visitDate) return null;
+    const tariff = isWeekend(form.visitDate) ? prices.weekend : prices.weekday;
+    return form.adults * tariff.adult + form.children * tariff.child;
+  }, [form.adults, form.children, form.visitDate]);
 
   function setCount(key: 'adults' | 'children', delta: number) {
     setForm((current) => ({
@@ -97,7 +114,7 @@ export function BookingForm() {
         <input id="booking-phone" name="phone" inputMode="tel" autoComplete="tel" required maxLength={24} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+998 90 123 45 67" />
       </div>
       <div className="field field--full">
-        <label htmlFor="booking-telegram">Telegram <span aria-hidden="true">(необязательно)</span></label>
+        <label htmlFor="booking-telegram">Telegram <span className="field-optional">(необязательно)</span></label>
         <input id="booking-telegram" name="telegram" autoComplete="off" maxLength={120} value={form.telegram} onChange={(e) => setForm({ ...form, telegram: e.target.value })} placeholder="@username" />
       </div>
       <div className="field field--full">
@@ -110,7 +127,7 @@ export function BookingForm() {
           <span className="counter-label">Взрослые</span>
           <div className="counter-actions">
             <button type="button" aria-label="Уменьшить количество взрослых" onClick={() => setCount('adults', -1)}>−</button>
-            <output aria-live="polite">{form.adults}</output>
+            <output aria-live="polite" aria-label="Количество взрослых">{form.adults}</output>
             <button type="button" aria-label="Увеличить количество взрослых" onClick={() => setCount('adults', 1)}>+</button>
           </div>
         </div>
@@ -118,11 +135,19 @@ export function BookingForm() {
           <span className="counter-label">Дети</span>
           <div className="counter-actions">
             <button type="button" aria-label="Уменьшить количество детей" onClick={() => setCount('children', -1)}>−</button>
-            <output aria-live="polite">{form.children}</output>
+            <output aria-live="polite" aria-label="Количество детей">{form.children}</output>
             <button type="button" aria-label="Увеличить количество детей" onClick={() => setCount('children', 1)}>+</button>
           </div>
         </div>
       </div>
+
+      {estimate !== null ? (
+        <div className="booking-estimate" aria-live="polite">
+          <span className="booking-estimate-label">Ориентировочная стоимость</span>
+          <strong>{money(estimate)}</strong>
+          <small>Детский тариф рассчитан для возраста 5–14 лет; до 5 лет бесплатно. Окончательную стоимость подтвердит администратор.</small>
+        </div>
+      ) : null}
 
       <div className="field field--full">
         <label htmlFor="booking-comment">Комментарий</label>
