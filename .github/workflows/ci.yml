@@ -1,0 +1,59 @@
+name: MVP CI
+
+# GitHub Actions minutes are currently exhausted for this repository.
+# Keep the full verification workflow available, but do not run it automatically.
+# Re-enable push/pull_request triggers when limits are restored.
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://monaco:monaco@127.0.0.1:5432/monaco?schema=public
+      ADMIN_EMAIL: admin@monaco.test
+      ADMIN_PASSWORD: TestPassword123!
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      CI: true
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: monaco
+          POSTGRES_USER: monaco
+          POSTGRES_PASSWORD: monaco
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U monaco -d monaco"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run media:sync
+      - run: npx prisma generate
+      - run: npm run db:deploy
+      - run: npm run db:seed
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - name: Upload visual checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monaco-visual-checks
+          path: |
+            artifacts
+            playwright-report
+            test-results
+          if-no-files-found: ignore
