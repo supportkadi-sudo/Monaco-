@@ -46,9 +46,10 @@ test('mobile: hero, menu and delayed fixed CTA', async ({ page }, testInfo) => {
   await expect(page.locator('.mobile-cta')).toBeHidden();
 
   await page.getByRole('button', { name: 'Открыть меню' }).click();
-  await expect(page.getByRole('dialog', { name: 'Навигация Monaco Aquapark' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Instagram' })).toBeVisible();
-  await page.getByRole('button', { name: 'Закрыть меню' }).last().click();
+  const dialog = page.getByRole('dialog', { name: 'Навигация Monaco Aquapark' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('link', { name: /Instagram/ })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Закрыть меню' }).click();
 
   await page.locator('#prices').scrollIntoViewIfNeeded();
   await expect(page.locator('.mobile-cta')).toBeVisible();
