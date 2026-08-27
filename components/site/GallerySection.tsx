@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { media } from '@/lib/site';
+import { media, site } from '@/lib/site';
 
 const items = [
   { src: media.pool, alt: 'Бассейн Monaco Aquapark' },
@@ -14,11 +14,17 @@ const items = [
 
 export function GallerySection() {
   const [active, setActive] = useState<number | null>(null);
+  const isOpen = active !== null;
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
+  function move(delta: number) {
+    setActive((value) => value === null ? null : (value + delta + items.length) % items.length);
+  }
+
   useEffect(() => {
-    if (active === null) return;
+    if (!isOpen) return;
 
     previouslyFocused.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const previousOverflow = document.body.style.overflow;
@@ -27,8 +33,24 @@ export function GallerySection() {
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setActive(null);
-      if (event.key === 'ArrowRight') setActive((value) => value === null ? null : (value + 1) % items.length);
-      if (event.key === 'ArrowLeft') setActive((value) => value === null ? null : (value - 1 + items.length) % items.length);
+      if (event.key === 'ArrowRight') move(1);
+      if (event.key === 'ArrowLeft') move(-1);
+
+      if (event.key === 'Tab' && dialogRef.current) {
+        const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]'))
+          .filter((element) => element.offsetParent !== null);
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (!first || !last) return;
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
 
     document.addEventListener('keydown', onKeyDown);
@@ -37,7 +59,7 @@ export function GallerySection() {
       document.body.style.overflow = previousOverflow;
       previouslyFocused.current?.focus();
     };
-  }, [active]);
+  }, [isOpen]);
 
   return (
     <section className="section" id="gallery">
@@ -47,21 +69,27 @@ export function GallerySection() {
             <div className="eyebrow">A day at Monaco</div>
             <h2 className="section-title">Галерея Monaco</h2>
           </div>
-          <span className="section-lead">Настоящие фотографии комплекса</span>
+          <div className="gallery-aside">
+            <span className="section-lead">Настоящие фотографии комплекса</span>
+            <a className="gallery-instagram" href={site.instagramUrl} target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗</span></a>
+          </div>
         </div>
         <div className="gallery-grid">
           {items.map((item, index) => (
             <button className="gallery-item" key={`${item.src}-${index}`} onClick={() => setActive(index)} aria-label={`Открыть фото: ${item.alt}`}>
-              <Image src={item.src} alt={item.alt} fill sizes="(max-width: 820px) 50vw, 35vw" />
+              <Image src={item.src} alt={item.alt} fill loading="lazy" quality={84} sizes="(max-width: 820px) 50vw, 35vw" />
             </button>
           ))}
         </div>
       </div>
 
       {active !== null ? (
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр фотографии" onClick={() => setActive(null)}>
+        <div ref={dialogRef} className="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр фотографии" onClick={() => setActive(null)}>
           <button ref={closeRef} className="lightbox-close" aria-label="Закрыть" onClick={() => setActive(null)}>×</button>
-          <Image src={items[active].src} alt={items[active].alt} width={1400} height={1000} onClick={(event) => event.stopPropagation()} />
+          <button className="lightbox-arrow lightbox-arrow--prev" aria-label="Предыдущее фото" onClick={(event) => { event.stopPropagation(); move(-1); }}>←</button>
+          <Image src={items[active].src} alt={items[active].alt} width={1600} height={1100} quality={90} sizes="94vw" onClick={(event) => event.stopPropagation()} />
+          <button className="lightbox-arrow lightbox-arrow--next" aria-label="Следующее фото" onClick={(event) => { event.stopPropagation(); move(1); }}>→</button>
+          <div className="lightbox-count" aria-live="polite">{active + 1} / {items.length}</div>
         </div>
       ) : null}
     </section>
