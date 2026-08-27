@@ -1,12 +1,12 @@
 import { site } from '@/lib/site';
+import { BrandLogo } from './BrandLogo';
 import { MobileMenu } from './MobileMenu';
 
 export function Header() {
   return (
     <header className="site-header container">
       <a className="logo" href="#top" aria-label="Monaco Aquapark — на главную">
-        <span className="logo-main">MONACO</span>
-        <span className="logo-sub">AQUAPARK</span>
+        <BrandLogo priority />
       </a>
       <nav className="site-nav" aria-label="Основная навигация">
         <a href="#about">О нас</a>
