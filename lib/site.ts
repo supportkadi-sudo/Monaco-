@@ -2,6 +2,8 @@ export const site = {
   name: 'Monaco Aquapark',
   phone: '+998 95 215 15 15',
   phoneHref: 'tel:+998952151515',
+  email: 'monacoaquapark@gmail.com',
+  emailHref: 'mailto:monacoaquapark@gmail.com',
   address: 'Ташкент, Мирзо-Улугбекский район, массив Карасу-4, ул. Гулсанам',
   shortAddress: 'Карасу-4, ул. Гулсанам',
   hours: 'Уточняйте по телефону',
@@ -23,6 +25,31 @@ export const prices = {
   },
   note: 'Детям до 5 лет — бесплатно. Детский тариф: 5–14 лет.'
 } as const;
+
+export const beforeVisitFaq = [
+  {
+    question: 'Можно ли приезжать круглый год?',
+    answer: 'Да. Monaco — крытый комплекс, поэтому отдых не зависит от сезона и погоды.'
+  },
+  {
+    question: 'Есть ли зона для детей?',
+    answer: 'Да. В Monaco предусмотрены специальные детские зоны и неглубокие бассейны для маленьких гостей.'
+  },
+  {
+    question: 'Что есть кроме бассейнов?',
+    answer: 'В комплексе есть финские сауны, турецкие хаммамы, SPA, гидромассаж и джакузи.'
+  },
+  {
+    question: 'Можно ли перекусить на месте?',
+    answer: 'Да. На территории Monaco работает фуд-корт.'
+  },
+  {
+    question: 'Как узнать актуальное время работы?',
+    answer: `Точное время лучше уточнить перед поездкой по телефону ${site.phone}.`
+  }
+] as const;
+
+export const verifiedReviews = [] as const;
 
 export const media = {
   hero: '/images/monaco/hero.webp',
