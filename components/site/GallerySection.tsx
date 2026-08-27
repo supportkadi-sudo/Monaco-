@@ -4,13 +4,23 @@ import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { media, site } from '@/lib/site';
 
-const items = [
+type GallerySlot = 'pool' | 'ship' | 'sauna' | 'hero' | 'party';
+
+type GalleryItem = {
+  src: string;
+  alt: string;
+  slot: GallerySlot;
+  mobileFeatured?: boolean;
+  party?: boolean;
+};
+
+const items: readonly GalleryItem[] = [
   { src: media.pool, alt: 'Бассейн Monaco Aquapark', slot: 'pool' },
   { src: media.ship, alt: 'Корабль с надписью MONACO в бассейне', slot: 'ship' },
   { src: media.sauna, alt: 'Сауна Monaco Aquapark', slot: 'sauna' },
   { src: media.hero, alt: 'Пространство Monaco Aquapark', slot: 'hero', mobileFeatured: true },
   { src: media.party, alt: 'Событие в Monaco Aquapark', slot: 'party', party: true }
-] as const;
+];
 
 export function GallerySection() {
   const [active, setActive] = useState<number | null>(null);
