@@ -11,10 +11,14 @@ export function HeroSection() {
           <h1 className="hero-title">MONACO<br />AQUAPARK</h1>
           <p className="hero-kicker">Крытый аквапарк в Ташкенте</p>
           <div className="hero-rule" aria-hidden="true" />
-          <p className="hero-emotion">Отдых,<br />к которому хочется<br />вернуться</p>
+          <p className="hero-emotion">
+            <span>Отдых,</span>
+            <span>к которому хочется</span>
+            <span>вернуться</span>
+          </p>
           <div className="hero-actions">
             <a className="btn" href="#booking">Забронировать</a>
-            <a className="btn btn-outline" href="#prices">Цены</a>
+            <a className="btn btn-outline btn-hero-secondary" href="#prices">Цены</a>
           </div>
         </div>
       </section>
