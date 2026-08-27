@@ -2,6 +2,7 @@ import { mkdir, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 
 const targetDir = path.join(process.cwd(), 'public', 'images', 'monaco');
+const brandSourceFile = path.join(process.cwd(), '.monaco-brand-source.json');
 const userAgent = 'MonacoAquaparkWebsite/1.0';
 const officialSite = 'https://monaqua.uz/';
 
@@ -113,5 +114,6 @@ try {
 } catch {
   const { svg, source } = await discoverOfficialLogoSvg();
   await writeFile(logoDestination, svg, 'utf8');
+  await writeFile(brandSourceFile, `${JSON.stringify({ source, syncedAt: new Date().toISOString() }, null, 2)}\n`, 'utf8');
   console.log(`Saved logo.svg from official source: ${source}`);
 }
