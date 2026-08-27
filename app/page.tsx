@@ -3,26 +3,31 @@ import { HeroSection } from '@/components/site/HeroSection';
 import { ZonesSection } from '@/components/site/ZonesSection';
 import { GallerySection } from '@/components/site/GallerySection';
 import { PricesSection } from '@/components/site/PricesSection';
+import { BeforeVisitSection } from '@/components/site/BeforeVisitSection';
+import { ReviewsSection } from '@/components/site/ReviewsSection';
 import { BookingSection } from '@/components/site/BookingSection';
 import { ContactsSection } from '@/components/site/ContactsSection';
-import { Footer, MobileCta } from '@/components/site/Footer';
-import { site } from '@/lib/site';
+import { Footer } from '@/components/site/Footer';
+import { MobileCta } from '@/components/site/MobileCta';
+import { site, verifiedReviews } from '@/lib/site';
 
 export default function HomePage() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'EntertainmentBusiness',
     name: 'Monaco Aquapark',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    url: siteUrl,
     telephone: site.phone,
+    email: site.email,
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Ташкент',
       streetAddress: 'массив Карасу-4, ул. Гулсанам',
       addressCountry: 'UZ'
     },
-    sameAs: [site.instagramUrl],
-    image: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/images/monaco/hero.webp`
+    sameAs: [site.instagramUrl, site.officialUrl],
+    image: `${siteUrl}/images/monaco/hero.webp`
   };
 
   return (
@@ -33,6 +38,8 @@ export default function HomePage() {
         <ZonesSection />
         <GallerySection />
         <PricesSection />
+        <BeforeVisitSection />
+        <ReviewsSection reviews={verifiedReviews} />
         <BookingSection />
         <ContactsSection />
       </main>
