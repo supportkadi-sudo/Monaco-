@@ -8,8 +8,8 @@ const items = [
   { src: media.pool, alt: 'Бассейн Monaco Aquapark' },
   { src: media.ship, alt: 'Корабль с надписью MONACO в бассейне' },
   { src: media.sauna, alt: 'Сауна Monaco Aquapark' },
-  { src: media.hero, alt: 'Пространство Monaco Aquapark' },
-  { src: media.party, alt: 'Событие в Monaco Aquapark' }
+  { src: media.hero, alt: 'Пространство Monaco Aquapark', mobileFeatured: true },
+  { src: media.party, alt: 'Событие в Monaco Aquapark', party: true }
 ];
 
 export function GallerySection() {
@@ -75,11 +75,26 @@ export function GallerySection() {
           </div>
         </div>
         <div className="gallery-grid">
-          {items.map((item, index) => (
-            <button className="gallery-item" key={`${item.src}-${index}`} onClick={() => setActive(index)} aria-label={`Открыть фото: ${item.alt}`}>
-              <Image src={item.src} alt={item.alt} fill loading="lazy" quality={84} sizes="(max-width: 820px) 50vw, 35vw" />
-            </button>
-          ))}
+          {items.map((item, index) => {
+            const className = [
+              'gallery-item',
+              item.mobileFeatured ? 'gallery-item--mobile-featured' : '',
+              item.party ? 'gallery-item--party' : ''
+            ].filter(Boolean).join(' ');
+
+            return (
+              <button className={className} key={`${item.src}-${index}`} onClick={() => setActive(index)} aria-label={`Открыть фото: ${item.alt}`}>
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  loading="lazy"
+                  quality={84}
+                  sizes={item.mobileFeatured ? '(max-width: 820px) 100vw, 35vw' : '(max-width: 820px) 50vw, 35vw'}
+                />
+              </button>
+            );
+          })}
         </div>
       </div>
 
