@@ -5,12 +5,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { media, site } from '@/lib/site';
 
 const items = [
-  { src: media.pool, alt: 'Бассейн Monaco Aquapark' },
-  { src: media.ship, alt: 'Корабль с надписью MONACO в бассейне' },
-  { src: media.sauna, alt: 'Сауна Monaco Aquapark' },
-  { src: media.hero, alt: 'Пространство Monaco Aquapark', mobileFeatured: true },
-  { src: media.party, alt: 'Событие в Monaco Aquapark', party: true }
-];
+  { src: media.pool, alt: 'Бассейн Monaco Aquapark', slot: 'pool' },
+  { src: media.ship, alt: 'Корабль с надписью MONACO в бассейне', slot: 'ship' },
+  { src: media.sauna, alt: 'Сауна Monaco Aquapark', slot: 'sauna' },
+  { src: media.hero, alt: 'Пространство Monaco Aquapark', slot: 'hero', mobileFeatured: true },
+  { src: media.party, alt: 'Событие в Monaco Aquapark', slot: 'party', party: true }
+] as const;
 
 export function GallerySection() {
   const [active, setActive] = useState<number | null>(null);
@@ -78,6 +78,7 @@ export function GallerySection() {
           {items.map((item, index) => {
             const className = [
               'gallery-item',
+              `gallery-item--${item.slot}`,
               item.mobileFeatured ? 'gallery-item--mobile-featured' : '',
               item.party ? 'gallery-item--party' : ''
             ].filter(Boolean).join(' ');
@@ -88,7 +89,7 @@ export function GallerySection() {
                   src={item.src}
                   alt={item.alt}
                   fill
-                  loading="lazy"
+                  loading={item.mobileFeatured ? 'eager' : 'lazy'}
                   quality={84}
                   sizes={item.mobileFeatured ? '(max-width: 820px) 100vw, 35vw' : '(max-width: 820px) 50vw, 35vw'}
                 />
